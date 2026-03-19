@@ -1,5 +1,6 @@
 import type { ESLint, Linter } from 'eslint';
 import { processor, isClientComponent } from './processor';
+import { getClientFiles } from './get-client-files';
 import compatPlugin from 'eslint-plugin-compat';
 
 const PLUGIN_NAME = 'next-compat';
@@ -27,6 +28,10 @@ const plugin: NextCompatPlugin = {
   configs: {},
 };
 
+// Get client files at module load time
+const clientFiles = getClientFiles();
+const targetFiles = clientFiles.length > 0 ? clientFiles : ['__no_client_files__'];
+
 /**
  * Recommended flat config - applies compat checking only to client components
  *
@@ -42,11 +47,10 @@ const plugin: NextCompatPlugin = {
 const recommendedConfig: Linter.Config[] = [
   {
     name: `${PLUGIN_NAME}/recommended`,
-    files: ['**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx'],
+    files: targetFiles,
     plugins: {
       [PLUGIN_NAME]: plugin,
     },
-    processor: `${PLUGIN_NAME}/client-compat`,
     rules: {
       [`${PLUGIN_NAME}/compat`]: 'warn',
     },
@@ -59,11 +63,10 @@ const recommendedConfig: Linter.Config[] = [
 const strictConfig: Linter.Config[] = [
   {
     name: `${PLUGIN_NAME}/strict`,
-    files: ['**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx'],
+    files: targetFiles,
     plugins: {
       [PLUGIN_NAME]: plugin,
     },
-    processor: `${PLUGIN_NAME}/client-compat`,
     rules: {
       [`${PLUGIN_NAME}/compat`]: 'error',
     },
@@ -76,7 +79,7 @@ plugin.configs = {
   strict: strictConfig,
 };
 
-// Export utilities
+// Export utilities (internal use only)
 export { isClientComponent, processor };
 export { plugin };
 export default plugin;

@@ -10,6 +10,6 @@ export default [
   // TypeScript config
   ...tseslint.configs.recommended,
 
-  // Apply next-compat plugin
+  // Apply next-compat (automatically detects client files)
   ...nextCompat.configs.recommended,
 ];
