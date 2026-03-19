@@ -1,7 +1,5 @@
 import { useState, useCallback } from 'react';
 
-// Custom hook using Clipboard API
-// Will be part of client bundle when imported by client component
 export function useClipboard() {
   const [copied, setCopied] = useState(false);
 

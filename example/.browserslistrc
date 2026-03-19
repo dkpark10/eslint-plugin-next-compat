@@ -1,4 +1,4 @@
-# https://nextjs.org/docs/architecture/supported-browsers
+# https://nextjs.org/docs/15/architecture/supported-browsers
 defaults
 chrome >= 64
 edge >= 79

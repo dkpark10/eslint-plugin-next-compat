@@ -9,6 +9,12 @@ export default [
 
   // TypeScript config
   ...tseslint.configs.recommended,
+  {
+    settings: {
+      polyfills: [
+      ]
+    },
+  },
 
   // Apply next-compat (automatically detects client files)
   ...nextCompat.configs.recommended,

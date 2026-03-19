@@ -1,20 +1,16 @@
 'use client';
 
-import { useBrowserInfo } from '../hooks/useBrowserInfo';
-import { useLocalStorage } from '../hooks/useLocalStorage';
-import { formatDate, capitalize } from '../utils/format';
-
-// Client component with deep dependency chain:
-// this component
-//   → useBrowserInfo hook
-//       → browser-api.ts utility (has navigator, screen APIs)
-//   → useLocalStorage hook
-//       → storage.ts utility (has localStorage, sessionStorage APIs)
-//   → format.ts utility (no browser APIs - should not warn)
+import { useBrowserInfo } from '@/hooks/useBrowserInfo';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useClipboard } from '@/hooks/useClipboard';
+import { useWindowSize } from '@/hooks/useWindowSize';
+import { formatDate, capitalize } from '@/utils/format';
 
 export default function ClientDeepDeps() {
   const browserInfo = useBrowserInfo();
   const [theme, setTheme] = useLocalStorage('theme', 'light');
+  useClipboard();
+  useWindowSize();
 
   return (
     <div>

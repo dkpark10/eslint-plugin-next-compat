@@ -1,5 +1,4 @@
 import type { ESLint, Linter } from 'eslint';
-import { processor, isClientComponent } from './processor';
 import { getClientFiles } from './get-client-files';
 import compatPlugin from 'eslint-plugin-compat';
 
@@ -15,12 +14,6 @@ const plugin: NextCompatPlugin = {
     version: '0.0.1',
   },
 
-  // Processor to filter compat messages for non-client files
-  processors: {
-    'client-compat': processor,
-  },
-
-  // Re-export eslint-plugin-compat's rules under our namespace
   rules: {
     compat: compatPlugin.rules!.compat,
   },
@@ -79,7 +72,5 @@ plugin.configs = {
   strict: strictConfig,
 };
 
-// Export utilities (internal use only)
-export { isClientComponent, processor };
 export { plugin };
 export default plugin;

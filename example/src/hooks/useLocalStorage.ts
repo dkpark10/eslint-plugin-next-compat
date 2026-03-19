@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getLocalStorage, setLocalStorage } from '../utils/storage';
 
-// Hook that uses storage utility
-// Deep dependency chain: client component → hook → storage util
-
 export function useLocalStorage<T>(key: string, initialValue: T) {
   const [value, setValue] = useState<T>(initialValue);
 

@@ -3,9 +3,7 @@ export default function ServerComponent() {
 
   return (
     <div>
-      {/* use client directive  */}
-      <p>use client</p> 
-      <p>{JSON.stringify(cloned)}</p>
+      {JSON.stringify(cloned)}
     </div>
   );
 }
