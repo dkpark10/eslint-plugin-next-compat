@@ -16,6 +16,7 @@ it('should detect all client files', () => {
   expect(result.sort()).toEqual([
     'src/app/client-deps/page.tsx',
     'src/app/composition/_components/client-wrapper.tsx',
+    'src/app/jsx-example/page.jsx',
     'src/app/nested-client/_components/child-no-directive.tsx',
     'src/app/nested-client/_components/client-parent.tsx',
     'src/components/client-component.tsx',
@@ -26,5 +27,6 @@ it('should detect all client files', () => {
     'src/utils/browser-api.ts',
     'src/utils/format.ts',
     'src/utils/storage.ts',
+    'src/utils/structed-clone.ts',
   ]);
 });

@@ -28,12 +28,12 @@ export function getClientFiles(options = {}) {
     const srcPath = path.resolve(cwd, appDir);
     const tsConfigFullPath = path.resolve(cwd, tsConfigPath);
 
-    // Get all tsx files in app directory
-    const tsxFilePaths = globSync(`${srcPath}/**/*.tsx`, {
+    // Get all tsx/jsx files in app directory
+    const componentFiles = globSync(`${srcPath}/**/*.{tsx,jsx}`, {
       ignore: ['**/node_modules/**'],
     });
 
-    if (tsxFilePaths.length === 0) {
+    if (componentFiles.length === 0) {
       return [];
     }
 
@@ -61,8 +61,8 @@ export function getClientFiles(options = {}) {
       }, /** @type {string[]} */ ([]));
     }
 
-    // Get all dependencies from tsx files
-    const allDependencies = getDependencies(tsxFilePaths);
+    // Get all dependencies from component files
+    const allDependencies = getDependencies(componentFiles);
 
     // Filter files that have "use client" directive
     const clientFiles = allDependencies.filter((filePath) => {
