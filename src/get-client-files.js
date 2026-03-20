@@ -5,19 +5,19 @@ import dependencyTree from 'dependency-tree';
 
 const USE_CLIENT_REGEX = /^(?:\s|\/\/[^\n]*\n|\/\*[\s\S]*?\*\/)*['"]use client['"]/;
 
-interface GetClientFilesOptions {
-  /** App directory path (default: 'src/app') */
-  appDir?: string;
-  /** Project root directory (default: process.cwd()) */
-  cwd?: string;
-  /** tsconfig.json path (default: 'tsconfig.json') */
-  tsConfigPath?: string;
-}
+/**
+ * @typedef {Object} GetClientFilesOptions
+ * @property {string} [appDir] - App directory path (default: 'src/app')
+ * @property {string} [cwd] - Project root directory (default: process.cwd())
+ * @property {string} [tsConfigPath] - tsconfig.json path (default: 'tsconfig.json')
+ */
 
 /**
  * Get all client component files including their dependencies
+ * @param {GetClientFilesOptions} [options]
+ * @returns {string[]}
  */
-export function getClientFiles(options: GetClientFilesOptions = {}): string[] {
+export function getClientFiles(options = {}) {
   const {
     appDir = 'src/app',
     cwd = process.cwd(),
@@ -37,14 +37,18 @@ export function getClientFiles(options: GetClientFilesOptions = {}): string[] {
       return [];
     }
 
-    // Get dependencies for a list of files
-    function getDependencies(fileList: string[]): string[] {
-      return fileList.reduce<string[]>((acc, filePath) => {
+    /**
+     * Get dependencies for a list of files
+     * @param {string[]} fileList
+     * @returns {string[]}
+     */
+    function getDependencies(fileList) {
+      return fileList.reduce((acc, filePath) => {
         try {
           const deps = dependencyTree.toList({
             filename: filePath,
             directory: cwd,
-            filter: (depPath: string) =>
+            filter: (/** @type {string} */ depPath) =>
               !depPath.includes('node_modules') &&
               !depPath.endsWith('.css') &&
               !depPath.endsWith('.scss'),
@@ -54,7 +58,7 @@ export function getClientFiles(options: GetClientFilesOptions = {}): string[] {
         } catch {
           return acc;
         }
-      }, []);
+      }, /** @type {string[]} */ ([]));
     }
 
     // Get all dependencies from tsx files
