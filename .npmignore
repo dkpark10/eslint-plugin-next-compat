@@ -1,0 +1,17 @@
+# Source
+src/
+tests/
+example/
+
+# Config
+tsup.config.js
+vitest.config.*
+tsconfig.json
+.eslintrc*
+eslint.config.*
+
+# Dev
+node_modules/
+.git/
+.github/
+*.log

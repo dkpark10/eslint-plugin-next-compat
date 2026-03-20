@@ -18,7 +18,8 @@
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "pnpm run build",
+    "deploy": "pnpm run test && pnpm run build && npm publish --access=public"
   },
   "keywords": [
     "eslint",
@@ -31,6 +32,14 @@
   ],
   "author": "dkpark10",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dkpark10/eslint-plugin-next-compat"
+  },
+  "homepage": "https://github.com/dkpark10/eslint-plugin-next-compat#readme",
+  "bugs": {
+    "url": "https://github.com/dkpark10/eslint-plugin-next-compat/issues"
+  },
   "peerDependencies": {
     "eslint": "^9.0.0"
   },
