@@ -7,10 +7,26 @@ const USE_CLIENT_REGEX = /^(?:\s|\/\/[^\n]*\n|\/\*[\s\S]*?\*\/)*['"]use client['
 
 /**
  * @typedef {Object} GetClientFilesOptions
- * @property {string} [appDir] - App directory path (default: 'src/app')
+ * @property {string} [appDir] - App directory path (default: auto-detect 'app' or 'src/app')
  * @property {string} [cwd] - Project root directory (default: process.cwd())
  * @property {string} [tsConfigPath] - tsconfig.json path (default: 'tsconfig.json')
  */
+
+/**
+ * Detect app directory (app/ or src/app/)
+ * @param {string} cwd
+ * @returns {string | null}
+ */
+function detectAppDir(cwd) {
+  const candidates = ['src/app', 'app'];
+  for (const dir of candidates) {
+    const fullPath = path.resolve(cwd, dir);
+    if (fs.existsSync(fullPath)) {
+      return dir;
+    }
+  }
+  return null;
+}
 
 /**
  * Get all client component files including their dependencies
@@ -19,10 +35,16 @@ const USE_CLIENT_REGEX = /^(?:\s|\/\/[^\n]*\n|\/\*[\s\S]*?\*\/)*['"]use client['
  */
 export function getClientFiles(options = {}) {
   const {
-    appDir = 'src/app',
     cwd = process.cwd(),
     tsConfigPath = 'tsconfig.json',
   } = options;
+
+  // Auto-detect app directory if not specified
+  const appDir = options.appDir ?? detectAppDir(cwd);
+
+  if (!appDir) {
+    return [];
+  }
 
   try {
     const srcPath = path.resolve(cwd, appDir);

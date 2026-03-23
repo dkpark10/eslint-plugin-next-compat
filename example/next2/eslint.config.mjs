@@ -10,12 +10,16 @@ export default [
   // TypeScript config
   ...tseslint.configs.recommended,
   {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
     settings: {
-      polyfills: [
-      ]
+      polyfills: [],
     },
   },
 
-  // Apply next-compat (automatically detects client files)
+  // Apply next-compat (App Router with root app/)
   ...nextCompat.configs.recommended,
 ];
