@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-next-compat",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "ESLint plugin for browser compatibility checking in Next.js App Router client components",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
