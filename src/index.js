@@ -1,10 +1,11 @@
-import { globSync } from 'glob';
-import { minimatch } from 'minimatch';
-import { getClientFiles } from './get-client-files.js';
-import compatPlugin from 'eslint-plugin-compat';
-const { name, version } = require('../package.json');
+import { globSync } from "glob";
+import { minimatch } from "minimatch";
+import { getClientFiles } from "./get-client-files.js";
+import { getBrowserslist } from "./get-browserslist.js";
+import compatPlugin from "eslint-plugin-compat";
+const { name, version } = require("../package.json");
 
-const PLUGIN_NAME = name.replace('eslint-plugin-', '');
+const PLUGIN_NAME = name.replace("eslint-plugin-", "");
 
 /**
  * @typedef {Object} ConfigOptions
@@ -43,17 +44,20 @@ const plugin = {
  * @returns {string[]}
  */
 function getTargetFiles(include, exclude) {
-  const additionalFiles = include?.flatMap((pattern) =>
-    globSync(pattern, { ignore: ['**/node_modules/**'] })
-  ) ?? [];
+  const additionalFiles =
+    include?.flatMap((pattern) =>
+      globSync(pattern, { ignore: ["**/node_modules/**"] }),
+    ) ?? [];
 
   const allFiles = [...new Set([...getClientFiles(), ...additionalFiles])];
 
   const filteredFiles = exclude?.length
-    ? allFiles.filter((file) => !exclude.some((pattern) => minimatch(file, pattern)))
+    ? allFiles.filter(
+        (file) => !exclude.some((pattern) => minimatch(file, pattern)),
+      )
     : allFiles;
 
-  return filteredFiles.length > 0 ? filteredFiles : ['__no_client_files__'];
+  return filteredFiles.length > 0 ? filteredFiles : ["__no_client_files__"];
 }
 
 /**
@@ -63,19 +67,28 @@ function getTargetFiles(include, exclude) {
  */
 function createConfig(severity, options) {
   const targetFiles = getTargetFiles(options?.include, options?.exclude);
+  const browserslist = getBrowserslist();
 
-  return [
-    {
-      name: `${PLUGIN_NAME}/${severity === 'warn' ? 'recommended' : 'strict'}`,
-      files: targetFiles,
-      plugins: {
-        [PLUGIN_NAME]: plugin,
-      },
-      rules: {
-        [`${PLUGIN_NAME}/compat`]: severity,
-      },
+  /** @type {import('eslint').Linter.Config} */
+  const config = {
+    name: `${PLUGIN_NAME}/${severity === "warn" ? "recommended" : "strict"}`,
+    files: targetFiles,
+    plugins: {
+      [PLUGIN_NAME]: plugin,
     },
-  ];
+    rules: {
+      [`${PLUGIN_NAME}/compat`]: severity,
+    },
+  };
+
+  // Auto-set browserslist if user doesn't have one
+  if (browserslist) {
+    config.settings = {
+      targets: browserslist,
+    };
+  }
+
+  return [config];
 }
 
 /**
@@ -95,10 +108,10 @@ function createConfigFunction(severity) {
   return /** @type {ConfigFunction} */ (fn);
 }
 
-plugin.configs = {
-  recommended: createConfigFunction('warn'),
-  strict: createConfigFunction('error'),
-};
+Object.assign(plugin.configs, {
+  recommended: createConfigFunction("warn"),
+  strict: createConfigFunction("error"),
+});
 
 export { plugin };
 export default plugin;

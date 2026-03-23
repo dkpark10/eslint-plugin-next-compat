@@ -9,9 +9,7 @@ describe("should detect all client files", () => {
     const EXAMPLE_PATH = path.resolve(__dirname, "../example/next1");
 
     const result = getClientFiles({
-      appDir: "src/app",
       cwd: EXAMPLE_PATH,
-      tsConfigPath: "tsconfig.json",
     });
 
     expect(result.sort()).toEqual([
@@ -41,9 +39,7 @@ describe("should detect all client files", () => {
     const EXAMPLE_PATH = path.resolve(__dirname, "../example/next2");
 
     const result = getClientFiles({
-      appDir: "app",
       cwd: EXAMPLE_PATH,
-      tsConfigPath: "tsconfig.json",
     });
 
     expect(result.sort()).toEqual([
