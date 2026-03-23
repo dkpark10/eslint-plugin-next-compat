@@ -1,11 +1,19 @@
 import { globSync } from "glob";
 import { minimatch } from "minimatch";
 import { getClientFiles } from "./get-client-files.js";
-import { getBrowserslist } from "./get-browserslist.js";
+import { getBrowserslist, getNextVersion } from "./get-browserslist.js";
 import compatPlugin from "eslint-plugin-compat";
 const { name, version } = require("../package.json");
 
 const PLUGIN_NAME = name.replace("eslint-plugin-", "");
+
+function getDocsUrl() {
+  const nextVersion = getNextVersion();
+  if (nextVersion && nextVersion >= 15) {
+    return `https://nextjs.org/docs/${nextVersion}/architecture/supported-browsers`;
+  }
+  return "https://nextjs.org/docs/architecture/supported-browsers";
+}
 
 /**
  * @typedef {Object} ConfigOptions
@@ -32,7 +40,16 @@ const plugin = {
   },
 
   rules: {
-    compat: compatPlugin.rules.compat,
+    compat: {
+      meta: {
+        ...compatPlugin.rules.compat.meta,
+        docs: {
+          ...compatPlugin.rules.compat.meta.docs,
+          url: getDocsUrl(),
+        },
+      },
+      create: compatPlugin.rules.compat.create,
+    },
   },
 
   configs: /** @type {NextCompatPlugin['configs']} */ ({}),

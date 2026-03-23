@@ -29,7 +29,7 @@ export const NEXTJS_BROWSERSLIST = {
  * @param {string} [cwd]
  * @returns {number | null}
  */
-function detectNextVersion(cwd = process.cwd()) {
+export function getNextVersion(cwd = process.cwd()) {
   try {
     const pkgPath = path.resolve(cwd, 'package.json');
     if (!fs.existsSync(pkgPath)) {
@@ -93,7 +93,7 @@ export function getBrowserslist(cwd = process.cwd()) {
     return null;
   }
 
-  const nextVersion = detectNextVersion(cwd);
+  const nextVersion = getNextVersion(cwd);
 
   if (!nextVersion) {
     // No Next.js detected, use Next.js 15 default
