@@ -59,6 +59,9 @@ export function getClientFiles(options = {}) {
       return [];
     }
 
+    // JS/TS 확장자만 허용 (svg, json, css 등 비-JS 파일 제외)
+    const JS_EXTENSIONS = /\.(tsx?|jsx?|mjs|cjs)$/;
+
     /**
      * Get dependencies for a list of files
      * @param {string[]} fileList
@@ -71,9 +74,7 @@ export function getClientFiles(options = {}) {
             filename: filePath,
             directory: cwd,
             filter: (/** @type {string} */ depPath) =>
-              !depPath.includes('node_modules') &&
-              !depPath.endsWith('.css') &&
-              !depPath.endsWith('.scss'),
+              !depPath.includes('node_modules') && JS_EXTENSIONS.test(depPath),
             tsConfig: fs.existsSync(tsConfigFullPath) ? tsConfigFullPath : undefined,
           });
           return [...acc, ...deps];
