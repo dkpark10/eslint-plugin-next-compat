@@ -7,6 +7,9 @@ const { name, version } = require("../package.json");
 
 const PLUGIN_NAME = name.replace("eslint-plugin-", "");
 
+/**
+ * @todo If Nextjs version has been upgraded..
+ */
 function getDocsUrl() {
   const nextVersion = getNextVersion();
   if (nextVersion && nextVersion >= 15) {
@@ -48,7 +51,18 @@ const plugin = {
           url: getDocsUrl(),
         },
       },
-      create: compatPlugin.rules.compat.create,
+      create(context) {
+        const sourceCode = context.getSourceCode?.() ?? context.sourceCode;
+        const { body } = sourceCode.ast;
+        const hasUseServer = body.some(
+          (node) =>
+            node.type === 'ExpressionStatement' &&
+            node.expression.type === 'Literal' &&
+            node.expression.value === 'use server',
+        );
+        if (hasUseServer) return {};
+        return compatPlugin.rules.compat.create(context);
+      },
     },
   },
 

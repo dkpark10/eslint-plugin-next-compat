@@ -110,3 +110,31 @@ createRuleTester('safari 12', ['structuredClone']).run(
     invalid: [],
   }
 );
+
+// "use client" directive - browser compat checks should apply
+createRuleTester('ie 11').run('compat - use client directive', rule, {
+  valid: [
+    { code: `"use client";\nconst arr = [1, 2, 3]; arr.map(x => x * 2);` },
+    { code: `'use client';\nconst arr = [1, 2, 3]; arr.map(x => x * 2);` },
+  ],
+  invalid: [
+    {
+      code: `"use client";\nfetch('/api');`,
+      errors: 1,
+    },
+    {
+      code: `'use client';\nnew IntersectionObserver(() => {});`,
+      errors: 1,
+    },
+  ],
+});
+
+// "use server" directive - server runs in Node.js, skip browser compat checks
+createRuleTester('ie 11').run('compat - use server directive', rule, {
+  valid: [
+    { code: `"use server";\nfetch('/api');` },
+    { code: `'use server';\nPromise.resolve(1);` },
+    { code: `"use server";\nnew IntersectionObserver(() => {});` },
+  ],
+  invalid: [],
+});
