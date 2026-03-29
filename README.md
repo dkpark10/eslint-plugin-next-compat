@@ -6,7 +6,7 @@ ESLint plugin that automatically detects **client components only** in Next.js A
 
 This plugin uses [eslint-plugin-compat](https://github.com/amilajack/eslint-plugin-compat) internally and wraps its rules.
 
-![demo](https://github-production-user-asset-6210df.s3.amazonaws.com/43857226/569869586-b131779c-10f4-43c0-a9b7-d04f125b7014.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20260326%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260326T154404Z&X-Amz-Expires=300&X-Amz-Signature=eccae6ac0122e2487193dca3b811efa804a7362d5fa2c674dbc575f6007d29fb&X-Amz-SignedHeaders=host)
+![demo](https://raw.githubusercontent.com/dkpark10/eslint-plugin-next-compat/master/demo.gif)
 
 ## Why Use This?
 
