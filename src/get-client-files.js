@@ -9,12 +9,24 @@ import dependencyTree from 'dependency-tree';
  * @returns {boolean}
  */
 function hasDirective(content, directive) {
+  let inBlockComment = false;
+
   for (const line of content.split('\n')) {
     const trimmed = line.trim();
 
-    if (!trimmed || trimmed.startsWith('//') || trimmed.startsWith('*')) {
+    if (!trimmed) continue;
+
+    if (inBlockComment) {
+      if (trimmed.includes('*/')) inBlockComment = false;
       continue;
     }
+
+    if (trimmed.startsWith('/*')) {
+      if (!trimmed.includes('*/')) inBlockComment = true;
+      continue;
+    }
+
+    if (trimmed.startsWith('//')) continue;
 
     const normalized = trimmed.replace(/;$/, '');
     return normalized === `'${directive}'` || normalized === `"${directive}"`;

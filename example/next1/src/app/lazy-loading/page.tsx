@@ -1,3 +1,6 @@
+/**
+ * block comment
+ */
 "use client";
 
 import type { LazyExoticComponent, ComponentType } from "react";
