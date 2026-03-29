@@ -3,7 +3,24 @@ import fs from 'fs';
 import path from 'path';
 import dependencyTree from 'dependency-tree';
 
-const USE_CLIENT_REGEX = /^(?:\s|\/\/[^\n]*\n|\/\*[\s\S]*?\*\/)*['"]use client['"]/;
+/**
+ * @param {string} content
+ * @param {'use client' | 'use server'} directive
+ * @returns {boolean}
+ */
+function hasDirective(content, directive) {
+  for (const line of content.split('\n')) {
+    const trimmed = line.trim();
+
+    if (!trimmed || trimmed.startsWith('//') || trimmed.startsWith('*')) {
+      continue;
+    }
+
+    const normalized = trimmed.replace(/;$/, '');
+    return normalized === `'${directive}'` || normalized === `"${directive}"`;
+  }
+  return false;
+}
 
 /**
  * @typedef {Object} GetClientFilesOptions
@@ -59,7 +76,6 @@ export function getClientFiles(options = {}) {
       return [];
     }
 
-    // JS/TS 확장자만 허용 (svg, json, css 등 비-JS 파일 제외)
     const JS_EXTENSIONS = /\.(tsx?|jsx?|mjs|cjs)$/;
 
     /**
@@ -91,7 +107,7 @@ export function getClientFiles(options = {}) {
     const clientFiles = allDependencies.filter((filePath) => {
       try {
         const content = fs.readFileSync(filePath, 'utf-8');
-        return USE_CLIENT_REGEX.test(content);
+        return hasDirective(content, 'use client');
       } catch {
         return false;
       }
@@ -100,8 +116,15 @@ export function getClientFiles(options = {}) {
     // Get all dependencies of client files (these are also client components)
     const clientDependencies = getDependencies(clientFiles);
 
-    // Return unique file paths as relative glob patterns
-    const uniqueFiles = [...new Set(clientDependencies)];
+    // Return unique file paths as relative glob patterns, excluding "use server" files
+    const uniqueFiles = [...new Set(clientDependencies)].filter((filePath) => {
+      try {
+        const content = fs.readFileSync(filePath, 'utf-8');
+        return !hasDirective(content, 'use server');
+      } catch {
+        return true;
+      }
+    });
 
     // Convert to relative paths for ESLint files pattern
     return uniqueFiles.map((filePath) => {

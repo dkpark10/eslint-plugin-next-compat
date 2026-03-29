@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import "./client-component.css";
 import data from './json/data.json';
+import { serverFunc } from '../utils/server-action';
 
 export default function ClientComponent() {
   useEffect(() => {
@@ -23,5 +24,11 @@ export default function ClientComponent() {
   const cloned = structuredClone(data);
   console.log(cloned);
 
-  return null;
+  const onClick = async () => {
+    await serverFunc();
+  }
+
+  return (
+    <button onClick={onClick} type="button">click</button>
+  );
 }
