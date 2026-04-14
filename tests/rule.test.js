@@ -126,6 +126,30 @@ createRuleTester('ie 11').run('compat - use client directive', rule, {
       code: `'use client';\nnew IntersectionObserver(() => {});`,
       errors: 1,
     },
+    {
+      // block comment before "use client" should still be linted
+      code: `/**\n * block comment\n */\n"use client";\nfetch('/api');`,
+      errors: 1,
+    },
+    {
+      code: `/**\n * block comment\n */\n'use client';\nnew IntersectionObserver(() => {});`,
+      errors: 1,
+    },
+    {
+      // line comment after "use client" should still be linted
+      code: `"use client";\n// some comment\nfetch('/api');`,
+      errors: 1,
+    },
+    {
+      // block comment after "use client" should still be linted
+      code: `"use client";\n/** block comment */\nnew IntersectionObserver(() => {});`,
+      errors: 1,
+    },
+    {
+      // blank lines and comments both above and below "use client"
+      code: `/**\n * block comment\n */\n\n\n"use client";\n\n\n// comment\nfetch('/api');`,
+      errors: 1,
+    },
   ],
 });
 
