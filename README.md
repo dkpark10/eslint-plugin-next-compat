@@ -23,8 +23,9 @@ This plugin identifies client code based on the following criteria:
 
 1. Scans all `.tsx`, `.jsx` component files in `src/app/**` or `app/**` directories
 2. Identifies files with `'use client'` directive
-3. Analyzes dependency tree of those files
-4. Applies [eslint-plugin-compat](https://github.com/amilajack/eslint-plugin-compat) rules to identified client files
+3. Excludes files with `'use server'` directive
+4. Analyzes dependency tree of those files
+5. Applies [eslint-plugin-compat](https://github.com/amilajack/eslint-plugin-compat) rules to identified client files
 
 ## Installation
 
