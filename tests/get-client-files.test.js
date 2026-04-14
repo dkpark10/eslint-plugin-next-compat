@@ -1,10 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, test, expect } from "vitest";
 import path from "path";
 import { fileURLToPath } from "url";
 import { getClientFiles } from "../src/get-client-files.js";
 
 describe("should detect all client files", () => {
-  it("src/app", () => {
+  test("src/app", () => {
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
     const EXAMPLE_PATH = path.resolve(__dirname, "../example/next1");
 
@@ -34,7 +34,7 @@ describe("should detect all client files", () => {
     ]);
   });
 
-  it("root/app", () => {
+  test("root/app", () => {
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
     const EXAMPLE_PATH = path.resolve(__dirname, "../example/next2");
 
@@ -42,8 +42,35 @@ describe("should detect all client files", () => {
       cwd: EXAMPLE_PATH,
     });
 
+    expect(result.sort()).toEqual(["app/page.tsx"]);
+  });
+
+  test("next-jsx", () => {
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    const EXAMPLE_PATH = path.resolve(__dirname, "../example/next-jsx");
+
+    const result = getClientFiles({
+      cwd: EXAMPLE_PATH,
+    });
+
     expect(result.sort()).toEqual([
-      "app/page.tsx",
+      "src/app/client-deps/page.jsx",
+      "src/app/composition/_components/client-wrapper.jsx",
+      "src/app/lazy-loading/_components/click-to-load-component.jsx",
+      "src/app/lazy-loading/_components/dynamic-component.jsx",
+      "src/app/lazy-loading/_components/lazy-component.jsx",
+      "src/app/lazy-loading/page.jsx",
+      "src/app/nested-client/_components/child-no-directive.jsx",
+      "src/app/nested-client/_components/client-parent.jsx",
+      "src/components/client-component.jsx",
+      "src/hooks/useBrowserInfo.js",
+      "src/hooks/useClipboard.js",
+      "src/hooks/useLocalStorage.js",
+      "src/hooks/useWindowSize.js",
+      "src/utils/browser-api.js",
+      "src/utils/format.js",
+      "src/utils/storage.js",
+      "src/utils/structed-clone.js",
     ]);
   });
 });

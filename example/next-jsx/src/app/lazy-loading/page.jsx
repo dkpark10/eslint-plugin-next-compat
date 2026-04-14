@@ -3,8 +3,6 @@
  */
 "use client";
 
-import type { LazyExoticComponent, ComponentType } from "react";
-
 import dynamic from "next/dynamic";
 import { lazy, Suspense, useState } from "react";
 
@@ -18,8 +16,7 @@ const DynamicComponent = dynamic(
 );
 
 export default function LazyLoadingPage() {
-  const [LazyComponent, setLazyComponent] =
-    useState<LazyExoticComponent<ComponentType> | null>(null);
+  const [LazyComponent, setLazyComponent] = useState(null);
 
   const onClick = () => {
     const Component = lazy(
