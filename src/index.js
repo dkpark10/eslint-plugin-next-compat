@@ -10,9 +10,11 @@ const PLUGIN_NAME = name.replace("eslint-plugin-", "");
 /**
  * @todo If Nextjs version has been upgraded..
  */
+const LATEST_NEXT_MAJOR = 16;
+
 function getDocsUrl() {
   const nextVersion = getNextVersion();
-  if (nextVersion && nextVersion >= 15) {
+  if (nextVersion && nextVersion < LATEST_NEXT_MAJOR) {
     return `https://nextjs.org/docs/${nextVersion}/architecture/supported-browsers`;
   }
   return "https://nextjs.org/docs/architecture/supported-browsers";
