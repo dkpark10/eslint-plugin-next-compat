@@ -1,7 +1,7 @@
-import { globSync } from 'glob';
-import fs from 'fs';
-import path from 'path';
-import dependencyTree from 'dependency-tree';
+import { globSync } from "glob";
+import fs from "fs";
+import path from "path";
+import dependencyTree from "dependency-tree";
 
 /**
  * @param {string} content
@@ -11,24 +11,24 @@ import dependencyTree from 'dependency-tree';
 function hasDirective(content, directive) {
   let inBlockComment = false;
 
-  for (const line of content.split('\n')) {
+  for (const line of content.split("\n")) {
     const trimmed = line.trim();
 
     if (!trimmed) continue;
 
     if (inBlockComment) {
-      if (trimmed.includes('*/')) inBlockComment = false;
+      if (trimmed.includes("*/")) inBlockComment = false;
       continue;
     }
 
-    if (trimmed.startsWith('/*')) {
-      if (!trimmed.includes('*/')) inBlockComment = true;
+    if (trimmed.startsWith("/*")) {
+      if (!trimmed.includes("*/")) inBlockComment = true;
       continue;
     }
 
-    if (trimmed.startsWith('//')) continue;
+    if (trimmed.startsWith("//")) continue;
 
-    const normalized = trimmed.replace(/;$/, '');
+    const normalized = trimmed.replace(/;$/, "");
     return normalized === `'${directive}'` || normalized === `"${directive}"`;
   }
   return false;
@@ -47,7 +47,7 @@ function hasDirective(content, directive) {
  * @returns {string | null}
  */
 function detectAppDir(cwd) {
-  const candidates = ['src/app', 'app'];
+  const candidates = ["src/app", "app"];
   for (const dir of candidates) {
     const fullPath = path.resolve(cwd, dir);
     if (fs.existsSync(fullPath)) {
@@ -63,10 +63,14 @@ function detectAppDir(cwd) {
  * @returns {string[]}
  */
 export function getClientFiles(options = {}) {
-  const {
-    cwd = process.cwd(),
-    tsConfigPath = 'tsconfig.json',
-  } = options;
+  const { cwd = process.cwd() } = options;
+
+  const tsConfigPath =
+    options.tsConfigPath ??
+    ["tsconfig.json", "jsconfig.json"].find((f) =>
+      fs.existsSync(path.resolve(cwd, f)),
+    ) ??
+    "tsconfig.json";
 
   // Auto-detect app directory if not specified
   const appDir = options.appDir ?? detectAppDir(cwd);
@@ -81,7 +85,7 @@ export function getClientFiles(options = {}) {
 
     // Get all tsx/jsx files in app directory
     const componentFiles = globSync(`${srcPath}/**/*.{tsx,jsx}`, {
-      ignore: ['**/node_modules/**'],
+      ignore: ["**/node_modules/**"],
     });
 
     if (componentFiles.length === 0) {
@@ -89,6 +93,36 @@ export function getClientFiles(options = {}) {
     }
 
     const JS_EXTENSIONS = /\.(tsx?|jsx?|mjs|cjs)$/;
+
+    // tsconfig.json → pass file path directly
+    // jsconfig.json → parse as object, inject allowJs:true and resolve baseUrl to absolute path
+    //   (ts.convertCompilerOptionsFromJson has no basePath arg, so relative baseUrl resolves
+    //    against process.cwd() which may differ from the project root)
+    let tsConfig;
+    if (fs.existsSync(tsConfigFullPath)) {
+      if (path.basename(tsConfigPath) === "tsconfig.json") {
+        tsConfig = tsConfigFullPath;
+      } else {
+        try {
+          const raw = fs
+            .readFileSync(tsConfigFullPath, "utf-8")
+            .replace(/,(\s*[}\]])/g, "$1");
+          const parsed = JSON.parse(raw);
+          const baseUrl = path.resolve(
+            cwd,
+            parsed.compilerOptions?.baseUrl ?? ".",
+          );
+          parsed.compilerOptions = {
+            ...parsed.compilerOptions,
+            allowJs: true,
+            baseUrl,
+          };
+          tsConfig = parsed;
+        } catch {
+          // ignore
+        }
+      }
+    }
 
     /**
      * Get dependencies for a list of files
@@ -102,8 +136,8 @@ export function getClientFiles(options = {}) {
             filename: filePath,
             directory: cwd,
             filter: (/** @type {string} */ depPath) =>
-              !depPath.includes('node_modules') && JS_EXTENSIONS.test(depPath),
-            tsConfig: fs.existsSync(tsConfigFullPath) ? tsConfigFullPath : undefined,
+              !depPath.includes("node_modules") && JS_EXTENSIONS.test(depPath),
+            tsConfig,
           });
           return [...acc, ...deps];
         } catch {
@@ -118,8 +152,8 @@ export function getClientFiles(options = {}) {
     // Filter files that have "use client" directive
     const clientFiles = allDependencies.filter((filePath) => {
       try {
-        const content = fs.readFileSync(filePath, 'utf-8');
-        return hasDirective(content, 'use client');
+        const content = fs.readFileSync(filePath, "utf-8");
+        return hasDirective(content, "use client");
       } catch {
         return false;
       }
@@ -131,8 +165,8 @@ export function getClientFiles(options = {}) {
     // Return unique file paths as relative glob patterns, excluding "use server" files
     const uniqueFiles = [...new Set(clientDependencies)].filter((filePath) => {
       try {
-        const content = fs.readFileSync(filePath, 'utf-8');
-        return !hasDirective(content, 'use server');
+        const content = fs.readFileSync(filePath, "utf-8");
+        return !hasDirective(content, "use server");
       } catch {
         return true;
       }
@@ -143,7 +177,7 @@ export function getClientFiles(options = {}) {
       return path.relative(cwd, filePath);
     });
   } catch (err) {
-    console.error('get-client-files error:', err);
+    console.error("get-client-files error:", err);
     return [];
   }
 }
