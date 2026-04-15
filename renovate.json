@@ -1,16 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "enabled": false,
   "packageRules": [
     {
       "matchPackageNames": ["next"],
       "matchUpdateTypes": ["major"],
+      "enabled": true,
       "labels": ["next-major-update"],
       "assignees": ["dkpark10"]
-    },
-    {
-      "matchPackageNames": ["next"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "enabled": false
     }
   ]
 }
