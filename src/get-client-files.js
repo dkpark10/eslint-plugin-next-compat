@@ -83,9 +83,9 @@ export function getClientFiles(options = {}) {
     const srcPath = path.resolve(cwd, appDir);
     const tsConfigFullPath = path.resolve(cwd, tsConfigPath);
 
-    // Get all tsx/jsx files in app directory
+    // Get all tsx/jsx files in app directory, excluding route handlers
     const componentFiles = globSync(`${srcPath}/**/*.{tsx,jsx}`, {
-      ignore: ["**/node_modules/**"],
+      ignore: ["**/node_modules/**", `${srcPath}/**/route.{ts,tsx,js,jsx}`],
     });
 
     if (componentFiles.length === 0) {

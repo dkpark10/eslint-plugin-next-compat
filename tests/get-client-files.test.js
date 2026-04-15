@@ -12,6 +12,7 @@ describe("should detect all client files", () => {
       cwd: EXAMPLE_PATH,
     });
 
+    expect(result).not.toContain("src/app/api/hello/route.ts");
     expect(result.sort()).toEqual([
       "src/app/client-deps/page.tsx",
       "src/app/composition/_components/client-wrapper.tsx",
@@ -53,6 +54,7 @@ describe("should detect all client files", () => {
       cwd: EXAMPLE_PATH,
     });
 
+    expect(result).not.toContain("src/app/api/hello/route.js");
     expect(result.sort()).toEqual([
       "src/app/client-deps/page.jsx",
       "src/app/composition/_components/client-wrapper.jsx",
