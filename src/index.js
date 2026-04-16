@@ -63,6 +63,14 @@ const plugin = {
             node.expression.value === 'use server',
         );
         if (hasUseServer) return {};
+
+        const hasServerOnly = body.some(
+          (node) =>
+            node.type === 'ImportDeclaration' &&
+            node.source.value === 'server-only',
+        );
+        if (hasServerOnly) return {};
+
         return compatPlugin.rules.compat.create(context);
       },
     },

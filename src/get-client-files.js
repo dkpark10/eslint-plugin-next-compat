@@ -35,6 +35,14 @@ function hasDirective(content, directive) {
 }
 
 /**
+ * @param {string} content
+ * @returns {boolean}
+ */
+function hasServerOnlyImport(content) {
+  return /import\s+['"]server-only['"]/.test(content);
+}
+
+/**
  * @typedef {Object} GetClientFilesOptions
  * @property {string} [appDir] - App directory path (default: auto-detect 'app' or 'src/app')
  * @property {string} [cwd] - Project root directory (default: process.cwd())
@@ -162,11 +170,11 @@ export function getClientFiles(options = {}) {
     // Get all dependencies of client files (these are also client components)
     const clientDependencies = getDependencies(clientFiles);
 
-    // Return unique file paths as relative glob patterns, excluding "use server" files
+    // Return unique file paths as relative glob patterns, excluding server-only files
     const uniqueFiles = [...new Set(clientDependencies)].filter((filePath) => {
       try {
         const content = fs.readFileSync(filePath, "utf-8");
-        return !hasDirective(content, "use server");
+        return !hasDirective(content, "use server") && !hasServerOnlyImport(content);
       } catch {
         return true;
       }
