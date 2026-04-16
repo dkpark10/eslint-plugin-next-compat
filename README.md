@@ -22,10 +22,10 @@ This plugin detects client components and **tracks all their dependencies**, ens
 This plugin identifies client code based on the following criteria:
 
 1. Scans all `.tsx`, `.jsx` component files in `src/app/**` or `app/**` directories
-2. Identifies files with `'use client'` directive
-3. Excludes files with `'use server'` directive
-4. Analyzes dependency tree of those files
-5. Applies [eslint-plugin-compat](https://github.com/amilajack/eslint-plugin-compat) rules to identified client files
+2. Collects dependencies using [dependency-tree](https://www.npmjs.com/package/dependency-tree) with `layouts.tsx`, `page.tsx` as entry points
+3. Identifies files with `'use client'` directive
+4. Excludes files with `'use server'` directive
+5. Excludes `server-only` modules
 
 ## Installation
 
