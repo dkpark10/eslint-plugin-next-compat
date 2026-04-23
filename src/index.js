@@ -154,5 +154,5 @@ Object.assign(plugin.configs, {
   strict: createConfigFunction("error"),
 });
 
-export { plugin };
+export { plugin, getClientFiles };
 export default plugin;

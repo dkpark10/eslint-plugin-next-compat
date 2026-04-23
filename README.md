@@ -112,6 +112,45 @@ export default [
 ];
 ```
 
+### Using `getClientFiles` with `eslint-plugin-compat` directly
+
+If you prefer to use `eslint-plugin-compat` directly instead of this plugin, you can use the exported `getClientFiles` utility to target only client component files.
+
+```js
+// eslint.config.js
+import compatPlugin from 'eslint-plugin-compat';
+import { getClientFiles } from 'eslint-plugin-next-compat';
+
+export default [
+  {
+    files: getClientFiles(),
+    plugins: {
+      compat: compatPlugin,
+    },
+    settings: {
+      targets: [
+        'chrome 64',
+        'edge 79',
+        'firefox 67',
+        'opera 51',
+        'safari 12',
+      ],
+    },
+    rules: {
+      'compat/compat': 'warn',
+    },
+  },
+];
+```
+
+`getClientFiles()` accepts an optional options object:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `cwd` | `string` | `process.cwd()` | Project root directory |
+| `appDir` | `string` | auto-detect | App directory (`'app'` or `'src/app'`) |
+| `tsConfigPath` | `string` | auto-detect | Path to `tsconfig.json` or `jsconfig.json` |
+
 ## License
 
 MIT

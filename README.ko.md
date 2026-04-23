@@ -113,6 +113,45 @@ export default [
 ];
 ```
 
+### `getClientFiles`로 `eslint-plugin-compat` 직접 사용하기
+
+이 플러그인 대신 `eslint-plugin-compat`을 직접 사용하고 싶다면, 내보낸 `getClientFiles` 유틸리티로 클라이언트 컴포넌트 파일만 대상으로 지정할 수 있습니다.
+
+```js
+// eslint.config.js
+import compatPlugin from 'eslint-plugin-compat';
+import { getClientFiles } from 'eslint-plugin-next-compat';
+
+export default [
+  {
+    files: getClientFiles(),
+    plugins: {
+      compat: compatPlugin,
+    },
+    settings: {
+      targets: [
+        'chrome 64',
+        'edge 79',
+        'firefox 67',
+        'opera 51',
+        'safari 12',
+      ],
+    },
+    rules: {
+      'compat/compat': 'warn',
+    },
+  },
+];
+```
+
+`getClientFiles()`는 선택적 옵션 객체를 받습니다:
+
+| 옵션 | 타입 | 기본값 | 설명 |
+|------|------|--------|------|
+| `cwd` | `string` | `process.cwd()` | 프로젝트 루트 디렉토리 |
+| `appDir` | `string` | 자동 감지 | app 디렉토리 (`'app'` 또는 `'src/app'`) |
+| `tsConfigPath` | `string` | 자동 감지 | `tsconfig.json` 또는 `jsconfig.json` 경로 |
+
 ## 라이선스
 
 MIT

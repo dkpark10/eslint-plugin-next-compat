@@ -52,6 +52,9 @@ importers:
 
   example/next1:
     dependencies:
+      eslint-plugin-compat:
+        specifier: ^6.2.1
+        version: 6.2.1(eslint@9.39.4)
       next:
         specifier: ^15.0.0
         version: 15.5.14(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
