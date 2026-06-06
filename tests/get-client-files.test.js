@@ -64,7 +64,7 @@ describe("should detect all client files", () => {
       cwd: EXAMPLE_PATH,
     });
 
-    expect(result.sort()).toEqual(["app/page.tsx"]);
+    expect(result.sort()).toEqual(["app/page.tsx", "instrumentation-client.ts"]);
   });
 
   test("next-jsx", () => {
