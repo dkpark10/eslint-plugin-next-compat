@@ -15,6 +15,7 @@ describe("should detect all client files", () => {
     expect(result).not.toContain("src/app/api/hello/route.ts");
     expect(result).not.toContain("src/utils/server-only-util.ts");
     expect(result.sort()).toEqual([
+      "src/app/blog/[slug]/page.tsx",
       "src/app/client-deps/page.tsx",
       "src/app/composition/_components/client-wrapper.tsx",
       "src/app/jsx-example/page.jsx",
