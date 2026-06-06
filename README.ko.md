@@ -26,6 +26,7 @@ Next.js App Router에서는 서버 컴포넌트와 클라이언트 컴포넌트�
 3. `'use client'` 지시어가 있는 파일을 식별
 4. `'use server'` 지시어가 있는 파일을 제외
 5. `server-only` 모듈을 제외
+6. Next.js 15 이상에서는 `instrumentation-client.{js,ts,jsx,tsx}`(프로젝트 루트 또는 `src/`)를 항상 포함 — `'use client'` 지시어는 없지만 브라우저에서만 실행되는 파일이므로
 
 
 ## 설치

@@ -2,6 +2,41 @@ import { globSync } from "glob";
 import fs from "fs";
 import path from "path";
 import dependencyTree from "dependency-tree";
+import { getNextVersion } from "./get-browserslist.js";
+
+/**
+ * instrumentation-client.js|ts was introduced in Next.js 15.3 and always
+ * runs in the browser (no 'use client' directive, not a React component),
+ * so directive-based detection can never find it.
+ * @see https://nextjs.org/docs/app/api-reference/file-conventions/instrumentation-client
+ */
+const INSTRUMENTATION_CLIENT_MIN_NEXT_VERSION = 15;
+
+/**
+ * @param {string} cwd
+ * @returns {string | null}
+ */
+function detectInstrumentationClientFile(cwd) {
+  const nextVersion = getNextVersion(cwd);
+  if (!nextVersion || nextVersion < INSTRUMENTATION_CLIENT_MIN_NEXT_VERSION) {
+    return null;
+  }
+
+  const candidates = [
+    "instrumentation-client.ts",
+    "instrumentation-client.tsx",
+    "instrumentation-client.js",
+    "instrumentation-client.jsx",
+    "src/instrumentation-client.ts",
+    "src/instrumentation-client.tsx",
+    "src/instrumentation-client.js",
+    "src/instrumentation-client.jsx",
+  ];
+
+  return (
+    candidates.find((candidate) => fs.existsSync(path.resolve(cwd, candidate))) ?? null
+  );
+}
 
 /**
  * @param {string} content
@@ -72,6 +107,7 @@ function detectAppDir(cwd) {
  */
 export function getClientFiles(options = {}) {
   const { cwd = process.cwd() } = options;
+  const instrumentationClientFile = detectInstrumentationClientFile(cwd);
 
   const tsConfigPath =
     options.tsConfigPath ??
@@ -84,7 +120,7 @@ export function getClientFiles(options = {}) {
   const appDir = options.appDir ?? detectAppDir(cwd);
 
   if (!appDir) {
-    return [];
+    return instrumentationClientFile ? [instrumentationClientFile] : [];
   }
 
   try {
@@ -97,7 +133,7 @@ export function getClientFiles(options = {}) {
     });
 
     if (componentFiles.length === 0) {
-      return [];
+      return instrumentationClientFile ? [instrumentationClientFile] : [];
     }
 
     const JS_EXTENSIONS = /\.(tsx?|jsx?|mjs|cjs)$/;
@@ -181,12 +217,14 @@ export function getClientFiles(options = {}) {
     });
 
     // Convert to relative paths for ESLint files pattern
-    return uniqueFiles.map((filePath) => {
-      return path.relative(cwd, filePath);
-    });
+    const relativeFiles = uniqueFiles.map((filePath) => path.relative(cwd, filePath));
+
+    return instrumentationClientFile
+      ? [...new Set([instrumentationClientFile, ...relativeFiles])]
+      : relativeFiles;
   } catch (err) {
     console.error("get-client-files error:", err);
-    return [];
+    return instrumentationClientFile ? [instrumentationClientFile] : [];
   }
 }
 

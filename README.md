@@ -26,6 +26,7 @@ This plugin identifies client code based on the following criteria:
 3. Identifies files with `'use client'` directive
 4. Excludes files with `'use server'` directive
 5. Excludes `server-only` modules
+6. On Next.js 15+, always includes `instrumentation-client.{js,ts,jsx,tsx}` (project root or `src/`) — it has no `'use client'` directive but only ever runs in the browser
 
 ## Installation
 

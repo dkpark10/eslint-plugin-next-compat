@@ -1,7 +1,25 @@
 import { describe, test, expect } from "vitest";
 import path from "path";
+import fs from "fs";
+import os from "os";
 import { fileURLToPath } from "url";
 import { getClientFiles } from "../src/get-client-files.js";
+
+/**
+ * @param {string} nextVersion
+ */
+function makeInstrumentationClientProject(nextVersion) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "next-compat-"));
+  fs.writeFileSync(
+    path.join(dir, "package.json"),
+    JSON.stringify({ dependencies: { next: nextVersion } }),
+  );
+  fs.writeFileSync(
+    path.join(dir, "instrumentation-client.ts"),
+    "structuredClone({ init: true });\n",
+  );
+  return dir;
+}
 
 describe("should detect all client files", () => {
   test("src/app", () => {
@@ -30,6 +48,7 @@ describe("should detect all client files", () => {
       "src/hooks/useClipboard.ts",
       "src/hooks/useLocalStorage.ts",
       "src/hooks/useWindowSize.ts",
+      "src/instrumentation-client.ts",
       "src/utils/browser-api.ts",
       "src/utils/format.ts",
       "src/utils/storage.ts",
@@ -76,5 +95,19 @@ describe("should detect all client files", () => {
       "src/utils/storage.js",
       "src/utils/structed-clone.js",
     ]);
+  });
+
+  describe("instrumentation-client.ts", () => {
+    test("included when Next.js version is 15+", () => {
+      const dir = makeInstrumentationClientProject("^15.0.0");
+      const result = getClientFiles({ cwd: dir });
+      expect(result).toEqual(["instrumentation-client.ts"]);
+    });
+
+    test("not checked when Next.js version is below 15", () => {
+      const dir = makeInstrumentationClientProject("^14.2.0");
+      const result = getClientFiles({ cwd: dir });
+      expect(result).toEqual([]);
+    });
   });
 });
