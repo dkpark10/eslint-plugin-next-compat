@@ -47,7 +47,8 @@
     "dependency-tree": "^11.4.0",
     "eslint-plugin-compat": "^6.0.0",
     "glob": "^13.0.6",
-    "minimatch": "^10.2.4"
+    "minimatch": "^10.2.4",
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
     "eslint": "^9.0.0",

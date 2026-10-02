@@ -2,6 +2,7 @@ import { globSync } from "glob";
 import fs from "fs";
 import path from "path";
 import dependencyTree from "dependency-tree";
+import ts from "typescript";
 import { getNextVersion } from "./get-browserslist.js";
 
 /**
@@ -138,33 +139,22 @@ export function getClientFiles(options = {}) {
 
     const JS_EXTENSIONS = /\.(tsx?|jsx?|mjs|cjs)$/;
 
-    // tsconfig.json → pass file path directly
-    // jsconfig.json → parse as object, inject allowJs:true and resolve baseUrl to absolute path
-    //   (ts.convertCompilerOptionsFromJson has no basePath arg, so relative baseUrl resolves
-    //    against process.cwd() which may differ from the project root)
+    // Pass already-parsed compiler options ({ options }) instead of a path or raw JSON.
+    // dependency-tree reduces a tsconfig path to raw JSON, which drops `pathsBasePath`,
+    // so `paths` without `baseUrl` (deprecated in TS 7) would never resolve.
+    // Passing the config file name also applies jsconfig.json defaults (allowJs, etc).
     let tsConfig;
     if (fs.existsSync(tsConfigFullPath)) {
-      if (path.basename(tsConfigPath) === "tsconfig.json") {
-        tsConfig = tsConfigFullPath;
-      } else {
-        try {
-          const raw = fs
-            .readFileSync(tsConfigFullPath, "utf-8")
-            .replace(/,(\s*[}\]])/g, "$1");
-          const parsed = JSON.parse(raw);
-          const baseUrl = path.resolve(
-            cwd,
-            parsed.compilerOptions?.baseUrl ?? ".",
-          );
-          parsed.compilerOptions = {
-            ...parsed.compilerOptions,
-            allowJs: true,
-            baseUrl,
-          };
-          tsConfig = parsed;
-        } catch {
-          // ignore
-        }
+      const { config, error } = ts.readConfigFile(tsConfigFullPath, ts.sys.readFile);
+      if (!error) {
+        const { options } = ts.parseJsonConfigFileContent(
+          config,
+          ts.sys,
+          path.dirname(tsConfigFullPath),
+          undefined,
+          tsConfigFullPath,
+        );
+        tsConfig = { options };
       }
     }
 
