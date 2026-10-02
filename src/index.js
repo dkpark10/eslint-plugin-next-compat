@@ -1,4 +1,4 @@
-import { globSync } from "glob";
+import { globSync, escape } from "glob";
 import { minimatch } from "minimatch";
 import { getClientFiles } from "./get-client-files.js";
 import { getBrowserslist, getNextVersion } from "./get-browserslist.js";
@@ -98,7 +98,10 @@ function getTargetFiles(include, exclude) {
       )
     : allFiles;
 
-  return filteredFiles.length > 0 ? filteredFiles : ["__no_client_files__"];
+  // Escape so Next.js route segments like [slug] are matched literally, not as glob classes
+  return filteredFiles.length > 0
+    ? filteredFiles.map((file) => escape(file))
+    : ["__no_client_files__"];
 }
 
 /**
