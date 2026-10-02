@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import path from 'path';
 import { ESLint } from 'eslint';
-import plugin from '../src/index';
+import { globSync } from 'glob';
+import plugin, { getClientFiles } from '../src/index';
 
 describe('plugin.configs', () => {
   describe('recommended', () => {
@@ -49,19 +50,39 @@ describe('plugin.configs', () => {
       vi.restoreAllMocks();
     });
 
-    it('should apply the rule to dynamic route files ([slug])', async () => {
-      const EXAMPLE_PATH = path.resolve(__dirname, '../example/next1');
-      vi.spyOn(process, 'cwd').mockReturnValue(EXAMPLE_PATH);
+    // Detected client files must actually be linted, and nothing else.
+    // Guards against glob-pattern mismatches like `[slug]` being read as a character class.
+    it.each(['next1', 'next2', 'next-jsx'])(
+      'should apply the rule to exactly the detected client files (%s)',
+      async (example) => {
+        const EXAMPLE_PATH = path.resolve(__dirname, '../example', example);
+        vi.spyOn(process, 'cwd').mockReturnValue(EXAMPLE_PATH);
 
-      const eslint = new ESLint({
-        cwd: EXAMPLE_PATH,
-        overrideConfigFile: true,
-        overrideConfig: plugin.configs.recommended(),
-      });
-      const config = await eslint.calculateConfigForFile('src/app/blog/[slug]/page.tsx');
+        const clientFiles = getClientFiles({ cwd: EXAMPLE_PATH });
+        expect(clientFiles.length).toBeGreaterThan(0);
 
-      expect(config?.rules?.['next-compat/compat']).toBeDefined();
-    });
+        const eslint = new ESLint({
+          cwd: EXAMPLE_PATH,
+          overrideConfigFile: true,
+          overrideConfig: plugin.configs.recommended(),
+        });
+
+        const sourceFiles = globSync('**/*.{ts,tsx,js,jsx}', {
+          cwd: EXAMPLE_PATH,
+          ignore: ['**/node_modules/**', '.next/**', '*.config.*', 'next-env.d.ts'],
+        });
+
+        const linted = [];
+        for (const file of sourceFiles) {
+          const config = await eslint.calculateConfigForFile(file);
+          if (config?.rules?.['next-compat/compat']) {
+            linted.push(file);
+          }
+        }
+
+        expect(linted.sort()).toEqual([...clientFiles].sort());
+      },
+    );
   });
 
   describe('strict', () => {
